@@ -97,4 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const lastQuote = JSON.parse(sessionStorage.getItem('lastQuote'));
   if (lastQuote) {
-    quoteDisplay.innerHTML = `"${lastQuote.text}" - <em>
+    quoteDisplay.innerHTML = `"${lastQuote.text}" - <em>${lastQuote.category}</em>`;
+  }
+});
