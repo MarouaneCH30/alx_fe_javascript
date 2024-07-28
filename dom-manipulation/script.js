@@ -1,12 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-  let quotes = JSON.parse(localStorage.getItem('quotes')) || [
-    { text: "The only limit to our realization of tomorrow is our doubts of today.", category: "Motivation" },
-    { text: "Life is 10% what happens to us and 90% how we react to it.", category: "Life" },
-    { text: "Good, better, best. Never let it rest. 'Til your good is better and your better is best.", category: "Improvement" },
-  ];
-
+  let quotes = JSON.parse(localStorage.getItem('quotes')) || [];
   const lastSelectedCategory = localStorage.getItem('selectedCategory') || 'all';
-
   const quoteDisplay = document.getElementById('quoteDisplay');
   const newQuoteButton = document.getElementById('newQuote');
   const addQuoteButton = document.getElementById('addQuoteButton');
@@ -15,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const exportQuotesButton = document.getElementById('exportQuotes');
   const importFileInput = document.getElementById('importFile');
   const categoryFilter = document.getElementById('categoryFilter');
+  const notification = document.getElementById('notification');
 
   function populateCategories() {
     const categories = ['all', ...new Set(quotes.map(quote => quote.category))];
@@ -45,14 +40,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function addQuote() {
     const quoteText = newQuoteText.value.trim();
     const quoteCategory = newQuoteCategory.value.trim();
-
     if (quoteText && quoteCategory) {
       quotes.push({ text: quoteText, category: quoteCategory });
       saveQuotes();
       populateCategories();
-      filterQuotes(); // Update the display with the new quote
+      filterQuotes();
       newQuoteText.value = '';
       newQuoteCategory.value = '';
+      syncWithServer(); // Sync after adding a new quote
       alert('Quote added successfully!');
     } else {
       alert('Please enter both a quote and a category.');
@@ -82,10 +77,31 @@ document.addEventListener('DOMContentLoaded', () => {
       quotes.push(...importedQuotes);
       saveQuotes();
       populateCategories();
-      filterQuotes(); // Update the display with the imported quotes
+      filterQuotes();
+      syncWithServer(); // Sync after importing quotes
       alert('Quotes imported successfully!');
     };
     fileReader.readAsText(event.target.files[0]);
+  }
+
+  function syncWithServer() {
+    // Fetch latest quotes from server
+    fetch('https://jsonplaceholder.typicode.com/posts')
+      .then(response => response.json())
+      .then(serverQuotes => {
+        const newQuotes = serverQuotes.filter(sq => !quotes.some(lq => lq.text === sq.text));
+        quotes.push(...newQuotes);
+        saveQuotes();
+        populateCategories();
+        filterQuotes();
+        notification.textContent = 'Quotes synced with server.';
+        setTimeout(() => notification.textContent = '', 3000);
+      })
+      .catch(error => console.error('Error syncing with server:', error));
+  }
+
+  function periodicSync() {
+    setInterval(syncWithServer, 30000); // Sync every 30 seconds
   }
 
   newQuoteButton.addEventListener('click', showRandomQuote);
@@ -101,4 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (lastQuote) {
     quoteDisplay.innerHTML = `"${lastQuote.text}" - <em>${lastQuote.category}</em>`;
   }
+
+  periodicSync(); // Start periodic syncing
 });
