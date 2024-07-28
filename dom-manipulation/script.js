@@ -9,21 +9,17 @@ let quotes = [
 
 // Function to display a random quote
 function showRandomQuote() {
-  if (quotes.length === 0) {
-    document.getElementById('quoteDisplay').textContent = "No quotes available.";
-    return;
-  }
   const randomIndex = Math.floor(Math.random() * quotes.length);
   const randomQuote = quotes[randomIndex];
   const quoteDisplay = document.getElementById('quoteDisplay');
-  quoteDisplay.textContent = `"${randomQuote.text}" - ${randomQuote.category}`;
+  quoteDisplay.textContent = `${randomQuote.text} - ${randomQuote.category}`;
 }
 
 // Function to add a new quote
 function addQuote() {
-  const newQuoteText = document.getElementById('newQuoteText').value.trim();
-  const newQuoteCategory = document.getElementById('newQuoteCategory').value.trim();
-
+  const newQuoteText = document.getElementById('newQuoteText').value;
+  const newQuoteCategory = document.getElementById('newQuoteCategory').value;
+  
   if (newQuoteText && newQuoteCategory) {
     quotes.push({ text: newQuoteText, category: newQuoteCategory });
     document.getElementById('newQuoteText').value = '';
