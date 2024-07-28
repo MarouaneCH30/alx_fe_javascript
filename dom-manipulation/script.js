@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
       quotes.push({ text: quoteText, category: quoteCategory });
       saveQuotes();
       populateCategories();
+      filterQuotes(); // Update the display with the new quote
       newQuoteText.value = '';
       newQuoteCategory.value = '';
       alert('Quote added successfully!');
@@ -81,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
       quotes.push(...importedQuotes);
       saveQuotes();
       populateCategories();
+      filterQuotes(); // Update the display with the imported quotes
       alert('Quotes imported successfully!');
     };
     fileReader.readAsText(event.target.files[0]);
